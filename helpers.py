@@ -60,14 +60,26 @@ def compare_method(truth_1, M_1, truth_2, M_2, acceptance_1=None, efficiency_1=N
     TF_1 = reco_1/truth_1
     print("Our truth_1 = %s and our reco_1 = %s" % (str(truth_1), str(reco_1)))
     print("The migration matrix M_1 = ")
-    print(np.matrix(M_1))
+    print(np.matrix(np.fliplr(M_1)))
     print("The transfer function TF_1 = %s" % str(TF_1))
     TF_2 = reco_2/truth_2
     print("Our truth_2 = %s and our reco_2 = %s" % (str(truth_2), str(reco_2)))
     print("The migration matrix M_2 = ")
-    print(np.matrix(M_2))
+    print(np.matrix(np.fliplr(M_2)))
     print("The transfer function TF_2 = %s" % str(TF_2))
     reco_2_transfer = truth_2 * TF_1
     print(reco_2_transfer)
     print("Difference between folded and actual reco_2 = %s %%" % str(percentage_difference(reco_2, reco_2_folded)))
     print("Difference between transfer function and actual reco_2 = %s %%" % str(percentage_difference(reco_2, reco_2_transfer)))
+    
+def unfold(data, migration, acceptance, efficiency):
+    migration_inv = np.linalg.inv(migration)
+    
+    unfolded = []
+    for i in range(0, len(data)):
+        summation = 0;
+        for j,d in enumerate(data):
+            summation += migration_inv[i,j] * acceptance[j] * d
+        unfolded.append(summation * 1/efficiency[i])
+
+    return unfolded
